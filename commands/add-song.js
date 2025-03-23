@@ -63,13 +63,15 @@ module.exports = {
 
 		let playlistID = interaction.options.getString("playlist");
 		let playlistName = "";
-		if (!playlistID)
-			await interaction.client.db.getDefaultPlaylist().then((data) => {
-				if (data) {
-					playlistID = data.playlist_id;
-					playlistName = data.playlist_name;
-				}
-			});
+
+		await interaction.client.db.getPlaylists(playlistID).then((data) => {
+			if (data && data.length > 0) {
+				playlistName = data[0].playlist_name;
+			} else {
+				interaction.reply("Please provide a valid Spotify playlist ID");
+				return;
+			}
+		});
 
 		const trackID = url.substring(
 			url.indexOf("track/") + 6,
