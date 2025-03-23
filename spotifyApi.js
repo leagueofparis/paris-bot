@@ -70,7 +70,9 @@ class SpotifyApi {
 
 		// Start Express server
 		app.listen(PORT, () => {
-			console.log(`Auth server running on 173.240.148.166:${PORT}/login`);
+			console.log(
+				`Auth server running on http://173.240.148.166:${PORT}/login`
+			);
 			loadTokens(); // Load tokens when the server starts
 		});
 	}
