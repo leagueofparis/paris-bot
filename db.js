@@ -110,14 +110,11 @@ class Database {
 	}
 
 	async removeSongFromPlaylist(playlistID, songID) {
-		console.log("Removing song from playlist:", playlistID, songID);
 		try {
-			await this.spotifyApi.removeTracksFromPlaylist(playlistID, [
-				{ uri: songID },
-			]);
+			await this.spotifyApi.removeTracksFromPlaylist(playlistID, songID);
 		} catch (e) {
 			console.log("Error removing song from playlist:", e);
-			return null;
+			return { data: null, error: e.message };
 		}
 
 		const { data, error } = await this.supabase
@@ -131,7 +128,90 @@ class Database {
 			return null;
 		}
 
-		return data;
+		return { data, error };
+	}
+
+	async getSongsAddedByUserForDay(userID) {
+		const date24HoursAgo = new Date(
+			Date.now() - 24 * 60 * 60 * 1000
+		).toISOString();
+		const { data, error } = await this.supabase
+			.from("playlist_songs")
+			.select("*")
+			.eq("added_by", BigInt(userID))
+			.gt("created_at", date24HoursAgo);
+
+		if (error) {
+			console.error("Error fetching songs added by user for day:", error);
+			return null;
+		}
+
+		return { data, error };
+	}
+
+	async blockUser(userID, addedBy) {
+		const { data, error } = await this.supabase
+			.from("playlist_blocked_users")
+			.insert([
+				{
+					user_id: userID,
+					added_by: addedBy,
+					created_at: new Date().toISOString(),
+					modified_at: new Date().toISOString(),
+				},
+			]);
+
+		if (error) {
+			console.error("Error blocking user:", error);
+			return null;
+		}
+
+		return { data, error };
+	}
+
+	async unblockUser(userID) {
+		// Check if the user is already blocked
+		const { data: existingBlockedUsers, error: fetchError } =
+			await this.supabase
+				.from("playlist_blocked_users")
+				.select("*")
+				.eq("user_id", BigInt(userID));
+
+		if (fetchError) {
+			console.error("Error fetching existing blocked users:", fetchError);
+			return { data: null, error: fetchError };
+		}
+
+		if (existingBlockedUsers.length === 0) {
+			console.log("User is not blocked");
+			return { data: null, error: "User is not blocked" };
+		}
+
+		const { data, error } = await this.supabase
+			.from("playlist_blocked_users")
+			.delete()
+			.eq("user_id", BigInt(userID));
+
+		if (error) {
+			console.error("Error unblocking user:", error);
+			return null;
+		}
+
+		return { data, error };
+	}
+
+	async getBlockedUser(userID) {
+		const { data, error } = await this.supabase
+			.from("playlist_blocked_users")
+			.select("*")
+			.eq("user_id", BigInt(userID));
+
+		if (error) {
+			console.error("Error fetching blocked user:", error);
+			return null;
+		}
+
+		return { data, error };
 	}
 }
 

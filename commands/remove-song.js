@@ -45,13 +45,18 @@ module.exports = {
 					playlistName = data.playlist_name;
 				}
 			});
-		const trackID = url.substring(url.indexOf("track/") + 6, url.indexOf("?"));
+
+		const trackID = url.substring(
+			url.indexOf("track/") + 6,
+			url.indexOf("?") === -1 ? url.length : url.indexOf("?")
+		);
 
 		if (!trackID) {
 			interaction.reply("Please provide a valid Spotify track URL");
 			return;
 		}
 
+		console.log("trackID", trackID);
 		const { data, error } = await interaction.client.db.removeSongFromPlaylist(
 			playlistID,
 			trackID
@@ -77,7 +82,7 @@ module.exports = {
 			.setDescription(
 				`Removed from [${playlistName}](https://open.spotify.com/playlist/${playlistID})!`
 			)
-			.setColor("#a10003")
+			.setColor("#bf41ae")
 			.setThumbnail(song.album.images[0].url);
 		interaction.reply({ embeds: [embed] });
 	},

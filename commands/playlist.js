@@ -19,7 +19,8 @@ module.exports = {
 			playlistID
 		);
 
-		if (playlist) interaction.reply(playlist.body.external_urls.spotify);
+		console.log("playlist", playlist);
+		if (playlist) interaction.reply(playlist.external_urls.spotify);
 		else interaction.reply("Playlist not found!");
 	},
 	async autocomplete(interaction) {

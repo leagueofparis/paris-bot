@@ -114,37 +114,59 @@ class SpotifyApi {
 		try {
 			console.log("Adding song to playlist:", playlistID, songID);
 
-			if (!Array.isArray(songID)) {
-				if (!songID.contains("spotify:track:")) {
-					songID = "spotify:track:" + songID;
-				}
+			songID = this.validateSongFormat(songID);
+			await spotifyWebApi.addTracksToPlaylist(playlistID, songID);
 
-				await spotifyWebApi.addTracksToPlaylist(playlistID, songID);
-			} else {
-				songID.forEach((song) => {
-					console.log("Adding song to playlist:", song);
-					if (!song.contains("spotify:track:")) {
-						song = "spotify:track:" + song;
-					}
-				});
-
-				await spotifyWebApi.addTracksToPlaylist(playlistID, [songID]);
-			}
-
-			await spotifyWebApi.addTracksToPlaylist(playlistID, [songID]);
 			console.log("Song added to playlist successfully");
 		} catch (error) {
 			return { data: null, error: error };
 		}
+
+		return { data: true, error: null };
 	}
 
 	async removeTracksFromPlaylist(playlistID, songID) {
 		try {
-			await spotifyWebApi.removeTracksFromPlaylist(playlistID, [songID]);
+			console.log("Removing song from playlist:", playlistID, songID);
+			await spotifyWebApi.removeTracksFromPlaylist(
+				playlistID,
+				this.validateSongFormat(songID, true)
+			);
 			console.log("Song removed from playlist successfully");
 		} catch (error) {
 			console.error("Error removing song from playlist:", error);
 		}
+		return { data: true, error: null };
+	}
+
+	validateSongFormat(songID, removeSong = false) {
+		let formattedSongID = "";
+		if (Array.isArray(songID)) {
+			formattedSongID = songID.map((song) => this.validateSongFormat(song));
+		}
+
+		if (songID.includes("spotify:track:")) {
+			formattedSongID = songID;
+		} else if (songID.includes("spotify.com/track/")) {
+			formattedSongID =
+				"spotify:track:" +
+				songID.substring(
+					songID.indexOf("track/") + 6,
+					songID.indexOf("?") === -1 ? songID.length : songID.indexOf("?")
+				);
+		} else {
+			formattedSongID = "spotify:track:" + songID;
+		}
+
+		if (removeSong) {
+			formattedSongID = { uri: formattedSongID };
+		}
+
+		if (!Array.isArray(formattedSongID)) {
+			formattedSongID = [formattedSongID];
+		}
+
+		return formattedSongID;
 	}
 }
 module.exports = SpotifyApi;

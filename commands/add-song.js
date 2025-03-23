@@ -17,13 +17,38 @@ module.exports = {
 				.setName("playlist")
 				.setDescription("Spotify Playlist ID")
 				.setAutocomplete(true)
-				.setRequired(false)
+				.setRequired(true)
 		),
 	/**
 	 *
 	 * @param {Interaction} interaction
 	 */
 	async execute(interaction) {
+		const { data: songs } =
+			await interaction.client.db.getSongsAddedByUserForDay(
+				interaction.user.id
+			);
+
+		if (songs && songs.length >= 5) {
+			interaction.reply({
+				content: "You can only add 5 songs per day",
+				flags: MessageFlags.Ephemeral,
+			});
+			return;
+		}
+
+		const { data: blocked } = await interaction.client.db.getBlockedUser(
+			interaction.user.id
+		);
+
+		if (blocked && blocked.length > 0) {
+			interaction.reply({
+				content: "You are blocked from adding songs",
+				flags: MessageFlags.Ephemeral,
+			});
+			return;
+		}
+
 		let url = interaction.options.getString("url");
 
 		if (!url) {
@@ -46,9 +71,10 @@ module.exports = {
 				}
 			});
 
-		console.log("playlistID", playlistID);
-
-		const trackID = url.substring(url.indexOf("track/") + 6, url.indexOf("?"));
+		const trackID = url.substring(
+			url.indexOf("track/") + 6,
+			url.indexOf("?") === -1 ? url.length : url.indexOf("?")
+		);
 
 		if (!trackID) {
 			interaction.reply("Please provide a valid Spotify track URL");
@@ -82,7 +108,7 @@ module.exports = {
 			.setDescription(
 				`Added to [${playlistName}](https://open.spotify.com/playlist/${playlistID})!`
 			)
-			.setColor("#711742")
+			.setColor("#bf41ae")
 			.setThumbnail(song.album.images[0].url);
 		interaction.reply({ embeds: [embed] });
 	},
