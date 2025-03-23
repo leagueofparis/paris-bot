@@ -71,7 +71,7 @@ module.exports = {
 		let playlistName = "";
 
 		await interaction.client.db.getPlaylist(playlistID).then((data) => {
-			if (data && data.length > 0) {
+			if (data) {
 				playlistName = data.playlist_name;
 			} else {
 				interaction.reply({
