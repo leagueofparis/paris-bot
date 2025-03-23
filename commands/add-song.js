@@ -70,10 +70,10 @@ module.exports = {
 		let playlistID = interaction.options.getString("playlist");
 		let playlistName = "";
 
-		await interaction.client.db.getPlaylist(playlistID).then((data) => {
-			if (data) {
-				console.log(data);
-				playlistName = data.playlist_name;
+		await interaction.client.db.getPlaylist(playlistID).then((res) => {
+			if (res) {
+				console;
+				playlistName = res.data.playlist_name;
 			} else {
 				interaction.reply({
 					content: "Please provide a valid Spotify playlist ID",
