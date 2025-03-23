@@ -8,7 +8,7 @@ const TOKEN_FILE = "spotify_tokens.json";
 class SpotifyApi {
 	constructor() {
 		const app = express();
-		const PORT = 8888;
+		const PORT = 27065;
 
 		// Helper function to save tokens to a file
 		function saveTokens(accessToken, refreshToken) {
@@ -70,7 +70,7 @@ class SpotifyApi {
 
 		// Start Express server
 		app.listen(PORT, () => {
-			console.log(`Auth server running on http://localhost:${PORT}/login`);
+			console.log(`Auth server running on 173.240.148.166:${PORT}/login`);
 			loadTokens(); // Load tokens when the server starts
 		});
 	}
