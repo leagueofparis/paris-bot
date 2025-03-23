@@ -52,23 +52,32 @@ module.exports = {
 		let url = interaction.options.getString("url");
 
 		if (!url) {
-			interaction.reply("Please provide a Spotify URL");
+			interaction.reply({
+				content: "Please provide a valid Spotify URL",
+				flags: MessageFlags.Ephemeral,
+			});
 			return;
 		}
 
 		if (!url.includes("spotify.com/track/")) {
-			interaction.reply("Please provide a valid Spotify track URL");
+			interaction.reply({
+				content: "Please provide a valid Spotify track URL",
+				flags: MessageFlags.Ephemeral,
+			});
 			return;
 		}
 
 		let playlistID = interaction.options.getString("playlist");
 		let playlistName = "";
 
-		await interaction.client.db.getPlaylists(playlistID).then((data) => {
+		await interaction.client.db.getPlaylist(playlistID).then((data) => {
 			if (data && data.length > 0) {
-				playlistName = data[0].playlist_name;
+				playlistName = data.playlist_name;
 			} else {
-				interaction.reply("Please provide a valid Spotify playlist ID");
+				interaction.reply({
+					content: "Please provide a valid Spotify playlist ID",
+					flags: MessageFlags.Ephemeral,
+				});
 				return;
 			}
 		});
@@ -79,7 +88,10 @@ module.exports = {
 		);
 
 		if (!trackID) {
-			interaction.reply("Please provide a valid Spotify track URL");
+			interaction.reply({
+				content: "Please provide a valid Spotify track ID",
+				flags: MessageFlags.Ephemeral,
+			});
 			return;
 		}
 

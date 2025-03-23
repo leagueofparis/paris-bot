@@ -32,19 +32,19 @@ class Database {
 		return data;
 	}
 
-	async getPlaylists(playlistID = null) {
-		const whereClause = playlistID ? `id = '${playlistID}'` : null;
+	async getPlaylist(playlistID) {
 		const { data, error } = await this.supabase
 			.from("playlists")
 			.select("*")
-			.match(whereClause);
+			.eq("playlist_id", playlistID)
+			.single();
 
 		if (error) {
-			console.error("Error fetching playlists:", error);
+			console.error("Error fetching playlist:", error);
 			return null;
 		}
 
-		return data;
+		return { data, error };
 	}
 
 	async getPlaylistSongs(playlistID) {
