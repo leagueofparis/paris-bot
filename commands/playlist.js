@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
+const { PermissionsBitField } = require("discord.js");
 const { v4: uuidv4 } = require("uuid"); // Generate UUIDs
 
 module.exports = {
@@ -26,7 +27,9 @@ module.exports = {
 	async autocomplete(interaction) {
 		const focusedValue = interaction.options.getFocused(true);
 		if (focusedValue.name === "playlist") {
-			const isAdmin = interaction.member.permissions.has("ADMINISTRATOR");
+			const isAdmin = interaction.member.permissions.has(
+				PermissionsBitField.Flags.Administrator
+			);
 
 			const query = interaction.client.db.supabase
 				.from("playlists")
