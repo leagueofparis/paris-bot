@@ -26,9 +26,17 @@ module.exports = {
 	async autocomplete(interaction) {
 		const focusedValue = interaction.options.getFocused(true);
 		if (focusedValue.name === "playlist") {
-			const { data, error } = await interaction.client.db.supabase
+			const isAdmin = interaction.member.permissions.has("ADMINISTRATOR");
+
+			const query = interaction.client.db.supabase
 				.from("playlists")
 				.select("playlist_id, playlist_name");
+
+			if (!isAdmin) {
+				query.eq("hidden", false);
+			}
+
+			const { data, error } = await query;
 
 			if (error) {
 				console.log(error);
