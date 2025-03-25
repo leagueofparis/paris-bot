@@ -113,23 +113,32 @@ module.exports = {
 
 		const song = await interaction.client.spotifyApi.getTrack(trackID);
 
-		let embed = new EmbedBuilder()
-			.setTitle(`${song.name} by ${song.artists[0].name}`)
-			.setAuthor({
-				name: "Song Added",
-				iconURL: "https://leagueofparis.com/images/spotify_icon.png",
-			})
-			.setURL(song.external_urls.spotify)
-			.setDescription(
-				`Added to [${playlistName}](https://open.spotify.com/playlist/${playlistID})!`
-			)
-			.setColor("#bf41ae")
-			.setThumbnail(song.album.images[0].url);
-		interaction.reply({ embeds: [embed] });
+		try {
+			let embed = new EmbedBuilder()
+				.setTitle(`${song.name} by ${song.artists[0].name}`)
+				.setAuthor({
+					name: "Song Added",
+					iconURL: "https://leagueofparis.com/images/spotify_icon.png",
+				})
+				.setURL(song.external_urls.spotify)
+				.setDescription(
+					`Added to [${playlistName}](https://open.spotify.com/playlist/${playlistID})!`
+				)
+				.setColor("#bf41ae")
+				.setThumbnail(song.album.images[0].url);
+			interaction.reply({ embeds: [embed] });
+		} catch {
+			interaction.reply({
+				content: "Song added!",
+			});
+			return;
+		}
 	},
 	async autocomplete(interaction) {
 		const focusedValue = interaction.options.getFocused(true);
 		if (focusedValue.name === "playlist") {
+			// const isAdmin = interaction.member.permissions.has("ADMINISTRATOR");
+
 			const { data, error } = await interaction.client.db.supabase
 				.from("playlists")
 				.select("playlist_id, playlist_name");
