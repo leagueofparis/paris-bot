@@ -105,3 +105,5 @@ dist
 
 # bot config
 config.json
+
+spotify_tokens.json
